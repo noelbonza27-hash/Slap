@@ -1,0 +1,64 @@
+-- REAL UNIVERSAL COMBAT & HITBOX EXPLOIT
+-- Optimize execution configuration
+if _G.CombatInitialized then
+    print("Script already active!")
+    return
+end
+_G.CombatInitialized = true
+
+-- Toggle states (Change these to false if you want to turn a feature off)
+_G.AutoAttack = true
+_G.BigHitboxes = true
+_G.HitboxScale = 15 -- Size of the enemy hitbox (Default is 2)
+
+-- Core Game Services
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Send visual confirmation directly in the Roblox system chat
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "System Status",
+    Text = "Universal Lua Core Loaded Successfully!",
+    Duration = 5
+})
+
+-- 1. REAL TIME HITBOX EXPANDER LOOP
+RunService.RenderStepped:Connect(function()
+    if _G.BigHitboxes then
+        pcall(function()
+            for _, player in pairs(Players:GetPlayers()) do
+                -- Do not modify your own character configuration
+                if player ~= LocalPlayer and player.Character then
+                    local root = player.Character:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        root.Size = Vector3.new(_G.HitboxScale, _G.HitboxScale, _G.HitboxScale)
+                        root.Transparency = 0.65
+                        root.BrickColor = BrickColor.new("Really blue")
+                        root.Material = Enum.Material.Neon
+                        root.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- 2. REAL TIME AUTO-CLICK / TOOL ACTIVATION LOOP
+task.spawn(function()
+    while true do
+        task.wait(0.05) -- Fast click cycle rate
+        if _G.AutoAttack then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character then
+                    -- Detects whatever tool, glove, or sword you are currently holding
+                    local weapon = character:FindFirstChildOfClass("Tool")
+                    if weapon then
+                        weapon:Activate()
+                    end
+                end
+            end)
+        end
+    end
+end)
